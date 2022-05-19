@@ -1,8 +1,8 @@
 import "reflect-metadata";
 import supertest from "supertest";
 import { container } from "tsyringe";
-import { InMemoryEventsRepository } from "../../src/infrastructure/repositories/InMemoryEventsRepository";
-import { Application } from "../../src/infrastructure/webserver/Application";
+import { InMemoryEventsRepository } from "../repositories/InMemoryEventsRepository";
+import { Application } from "./Application";
 
 const mockLogger = {
   log: jest.fn(),
@@ -28,9 +28,9 @@ describe("Get /events/:id", () => {
     });
   });
 
-  beforeEach(() => {
+  beforeEach(async () => {
     eventsRepository.reset();
-    initialEventIdInRepository = eventsRepository.addEvent(
+    initialEventIdInRepository = await eventsRepository.addEvent(
       initialEventNameInRepository,
       initialEventDescriptionInRepository
     );

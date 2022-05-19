@@ -1,5 +1,5 @@
 import bodyParser from "body-parser";
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import { container } from "tsyringe";
 import { EventsController } from "../../adapters/controllers/EventsController";
 import { ErrorHandler } from "./ErrorHandler";
@@ -18,6 +18,15 @@ export class Application {
     // load routes
     const eventsRouter = makeEventsRouter(container.resolve(EventsController));
     this.expressApplication.use("/events", eventsRouter);
+
+    // TODO move this into status
+    this.expressApplication.get(
+      "/",
+      (req: Request, res: Response, next: NextFunction) => {
+        res.status(200);
+        res.json({ message: "Server started" });
+      }
+    );
 
     // generic error handler
     this.expressApplication.use(ErrorHandler);

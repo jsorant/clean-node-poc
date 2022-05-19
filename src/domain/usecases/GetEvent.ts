@@ -22,9 +22,9 @@ export class GetEvent {
     this.logger = logger;
   }
 
-  execute(eventId: EventId): EventItem {
+  async execute(eventId: EventId): Promise<EventItem> {
     // Get
-    const event: EventItem = this.eventsRepository.getEvent(eventId);
+    const event: EventItem = await this.eventsRepository.getEvent(eventId);
 
     // Log operation
     if (event) {

@@ -30,7 +30,7 @@ describe("GetEvent use case", () => {
   test("should get an event from the event repository", async () => {
     const eventId = "eventId";
     const usecase: GetEvent = new GetEvent(mockEventsRepository, mockLogger);
-    const event: EventItem = usecase.execute(eventId);
+    const event: EventItem = await usecase.execute(eventId);
 
     expect(mockEventsRepository.getEvent.mock.calls.length).toBe(1);
     expect(mockEventsRepository.getEvent.mock.calls[0][0]).toBe(eventId);
@@ -42,7 +42,7 @@ describe("GetEvent use case", () => {
   test("should log name, description, id when retrieving an event", async () => {
     const eventId = "RequestId";
     const usecase: GetEvent = new GetEvent(mockEventsRepository, mockLogger);
-    usecase.execute(eventId);
+    await usecase.execute(eventId);
 
     const logParameter = mockLogger.log.mock.calls[0][0];
     expect(mockLogger.log.mock.calls.length).toBe(1);

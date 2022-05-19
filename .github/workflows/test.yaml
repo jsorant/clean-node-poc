@@ -10,5 +10,5 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Run integration tests
+      - name: Run unit & integration tests
         run: npm run test

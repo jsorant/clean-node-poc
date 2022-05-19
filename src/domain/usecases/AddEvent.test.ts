@@ -41,7 +41,8 @@ describe("AddEvent use case", () => {
       mockEventsRepository.addEvent.mockReset();
       const name = commands[i].name;
       const description = commands[i].description;
-      usecase.execute(name, description);
+      await usecase.execute(name, description);
+
       expect(mockEventsRepository.addEvent.mock.calls.length).toBe(1);
       expect(mockEventsRepository.addEvent.mock.calls[0][0]).toBe(name);
       expect(mockEventsRepository.addEvent.mock.calls[0][1]).toBe(description);
@@ -54,7 +55,7 @@ describe("AddEvent use case", () => {
       mockLogger,
       mockEventValidator
     );
-    usecase.execute("name", "description");
+    await usecase.execute("name", "description");
 
     const logParameter = mockLogger.log.mock.calls[0][0];
     expect(mockLogger.log.mock.calls.length).toBe(1);
@@ -69,7 +70,7 @@ describe("AddEvent use case", () => {
       mockLogger,
       mockEventValidator
     );
-    usecase.execute("name", "description");
+    await usecase.execute("name", "description");
 
     expect(mockEventValidator.ensureIsValidOrThrow.mock.calls.length).toBe(1);
     expect(mockEventValidator.ensureIsValidOrThrow.mock.calls[0][0]).toBe(

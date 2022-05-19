@@ -16,11 +16,15 @@ export class EventsController {
     this.getEvent = getEvent;
   }
 
-  addNewEvent(req: Request, res: Response, next: NextFunction): void {
+  async addNewEvent(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       // Call use case
       const { name, description } = req.body;
-      const id = this.addEvent.execute(name, description);
+      const id = await this.addEvent.execute(name, description);
 
       // Format response
       res.status(200);
@@ -39,11 +43,15 @@ export class EventsController {
     }
   }
 
-  getEventById(req: Request, res: Response, next: NextFunction): void {
+  async getEventById(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
     try {
       const eventId = req.params.id;
       // Call use case
-      const event: EventItem = this.getEvent.execute(eventId);
+      const event: EventItem = await this.getEvent.execute(eventId);
 
       // Format response
       if (event) {

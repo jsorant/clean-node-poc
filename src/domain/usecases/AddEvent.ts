@@ -23,12 +23,12 @@ export class AddEvent {
   }
 
   // Throws EventValidationError
-  execute(eventName: string, eventDescription: string): EventId {
+  async execute(eventName: string, eventDescription: string): Promise<EventId> {
     // Validate
     this.eventValidator.ensureIsValidOrThrow(eventName, eventDescription);
 
     // Add
-    const id: EventId = this.eventsRepository.addEvent(
+    const id: EventId = await this.eventsRepository.addEvent(
       eventName,
       eventDescription
     );

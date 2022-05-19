@@ -9,7 +9,7 @@
     "dev": "ts-node src/main/prod/main.ts",
     "dev:inmemory": "ts-node src/main/inmemory/main.ts",
     "dev:docker": "docker-compose -f docker-compose.yml up --build",
-    "test": "jest --config ./jest.config.json --verbose",
+    "test": "jest /src --verbose",
     "test:watch": "npm run test -- --watch --verbose",
     "test:e2e": "jest /tests-e2e --runInBand --verbose",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\""

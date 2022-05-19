@@ -1,0 +1,16 @@
+POST http://localhost:3000/events
+content-type: application/json
+
+{"name": "Event name", "description": "Event description"}
+
+###
+
+GET http://localhost:3000/events/0
+
+###
+
+GET http://localhost:3000/events/1
+
+###
+
+GET http://localhost:3000/events/10000

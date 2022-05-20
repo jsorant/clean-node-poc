@@ -56,7 +56,7 @@ export class EventsController {
     next: NextFunction
   ): Promise<void> {
     try {
-      const { jwt } = req.body;
+      const jwt = req.body.jwt;
       const eventId = req.params.id;
       // Call use case
       const event: EventItem = await this.getEvent.execute(eventId, jwt);

@@ -13,7 +13,6 @@ const COLUMN_DESCRIPTION = "description";
 
 export class MySqlEventsRepository implements IEventsRepository {
   async addEvent(name: string, description: string): Promise<EventId> {
-    console.log("CALL ADD");
     const connection = await this.getConnection();
     const [row] = await connection.query(
       `
@@ -28,7 +27,6 @@ export class MySqlEventsRepository implements IEventsRepository {
   }
 
   async getEvent(eventId: EventId): Promise<EventItem> {
-    console.log("CALL GET");
     const connection = await this.getConnection();
     const [rows] = await connection.query(
       `

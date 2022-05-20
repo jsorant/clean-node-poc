@@ -1,8 +1,8 @@
 import axios from "axios";
 import * as path from "path";
-import "reflect-metadata";
 import {
   GenericContainer,
+  Network,
   StartedNetwork,
   StartedTestContainer,
 } from "testcontainers";
@@ -16,7 +16,6 @@ describe("Application", () => {
   let apiUrl: string;
 
   beforeAll(async () => {
-    /*
     network = await new Network({
       name: "clean-node-poc-test-network",
     }).start();
@@ -28,7 +27,7 @@ describe("Application", () => {
       .withEnv("MYSQL_DATABASE", "test")
       .withNetworkMode(network.getName())
       .start();
-*/
+
     apiContainer = await new GenericContainer("node:14")
       .withExposedPorts(3000)
       .withEnv("MYSQL_HOST", "test_mysql")
@@ -36,17 +35,17 @@ describe("Application", () => {
       .withEnv("MYSQL_USER", "root")
       .withEnv("MYSQL_DATABASE", "test")
       .withEnv("MYSQL_PASSWORD", "password")
-      .withBindMount(path.join(__dirname, "./"), "/app")
-      .withCmd(["npm", "run", "dev:inmemory"])
-      /*.withHealthCheck({
-        test: "curl -f http://localhost:3000 || exit 1",
-        interval: 1000,
-        timeout: 3000,
-        retries: 5,
-        startPeriod: 1000,
-      })
-      .withWaitStrategy(Wait.forHealthCheck())*/
-      //.withNetworkMode(network.getName())
+      .withBindMount(path.join(__dirname, "./node_modules"), "/node_modules")
+      .withBindMount(
+        path.join(__dirname, "./babel.config.js"),
+        "/babel.config.js"
+      )
+      .withBindMount(path.join(__dirname, "./package.json"), "/package.json")
+      .withBindMount(path.join(__dirname, "./tsconfig.json"), "/tsconfig.json")
+      .withBindMount(path.join(__dirname, "./src"), "/src")
+      .withBindMount(path.join(__dirname, "./tests-e2e"), "/tests-e2e")
+      .withCmd(["npm", "run", "dev"])
+      .withNetworkMode(network.getName())
       .start();
 
     const apiLogs = await apiContainer.logs();

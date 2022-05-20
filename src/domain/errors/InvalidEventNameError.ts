@@ -1,6 +1,6 @@
 export class InvalidEventNameError extends Error {
-  constructor(message) {
-    super(message);
+  constructor(public readonly forbiddenWord) {
+    super(`Name cannot contain the forbidden words: ${forbiddenWord}`);
     this.name = "InvalidEventNameError";
   }
 }

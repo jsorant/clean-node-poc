@@ -1,12 +1,16 @@
 import "reflect-metadata";
 import supertest from "supertest";
 import { container } from "tsyringe";
-import { InMemoryEventsRepository } from "../../src/infrastructure/repositories/InMemoryEventsRepository";
-import { Application } from "../../src/infrastructure/webserver/Application";
+import { EventValidator } from "../../domain/entities/EventValidator";
+import { InMemoryEventsRepository } from "../repositories/InMemoryEventsRepository";
+import { InMemoryJwtAuthentication } from "../services/InMemoryJwtAuthentication";
+import { Application } from "./Application";
 
 const mockLogger = {
   log: jest.fn(),
 };
+
+const jwt = "validJwt";
 
 const eventsRepository: InMemoryEventsRepository =
   new InMemoryEventsRepository();
@@ -22,13 +26,27 @@ describe("POST /events", () => {
     container.register("ILogger", {
       useValue: mockLogger,
     });
+
+    container.register("IJwtAuthentication", {
+      useClass: InMemoryJwtAuthentication,
+    });
+
+    container.register("IEventValidator", {
+      useClass: EventValidator,
+    });
   });
 
   beforeEach(() => {
     eventsRepository.reset();
   });
 
-  describe("given a name and a description", () => {
+  describe("given a valid name, a valid description and a valid jwt", () => {
+    const validBody = {
+      name: "Name",
+      description: "Description",
+      jwt,
+    };
+
     test("should save the username and the password in the repository", async () => {
       const application = new Application();
 
@@ -37,10 +55,7 @@ describe("POST /events", () => {
         application.getExpressApplication()
       )
         .post("/events")
-        .send({
-          name: "Name",
-          description: "Description",
-        });
+        .send(validBody);
       const addedEventId = addEventResponse.body.eventId;
 
       // Try to retrieve the event using its id
@@ -48,7 +63,9 @@ describe("POST /events", () => {
         application.getExpressApplication()
       )
         .get(`/events/${addedEventId}`)
-        .send();
+        .send({
+          jwt,
+        });
 
       expect(getEventResponse.body.name).toBe("Name");
       expect(getEventResponse.body.description).toBe("Description");
@@ -59,10 +76,7 @@ describe("POST /events", () => {
       const application = new Application();
       const response = await supertest(application.getExpressApplication())
         .post("/events")
-        .send({
-          name: "Name",
-          description: "Description",
-        });
+        .send(validBody);
       expect(response.body.eventId).not.toBeUndefined();
       expect(response.body.eventId.length).toBeGreaterThan(0);
     });
@@ -71,10 +85,7 @@ describe("POST /events", () => {
       const application = new Application();
       const response = await supertest(application.getExpressApplication())
         .post("/events")
-        .send({
-          name: "Name",
-          description: "Description",
-        });
+        .send(validBody);
       expect(response.statusCode).toBe(200);
     });
 
@@ -82,10 +93,7 @@ describe("POST /events", () => {
       const application = new Application();
       const response = await supertest(application.getExpressApplication())
         .post("/events")
-        .send({
-          name: "Name",
-          description: "Description",
-        });
+        .send(validBody);
       expect(response.headers["content-type"]).toEqual(
         expect.stringContaining("json")
       );
@@ -93,14 +101,15 @@ describe("POST /events", () => {
   });
 
   describe("when the name is incorrect", () => {
+    const invalidBodies = [
+      { description: "Description", jwt },
+      { name: undefined, description: "Description", jwt },
+      { name: "", description: "Description", jwt },
+    ];
+
     test("should respond with 400", async () => {
       const application = new Application();
-      const bodies = [
-        { description: "Description" },
-        { name: undefined, description: "Description" },
-        { name: "", description: "Description" },
-      ];
-      for (const body of bodies) {
+      for (const body of invalidBodies) {
         const response = await supertest(application.getExpressApplication())
           .post("/events")
           .send(body);
@@ -110,28 +119,21 @@ describe("POST /events", () => {
 
     test("should respond with an error in json", async () => {
       const application = new Application();
-      const bodies = [
-        { description: "Description" },
-        { name: undefined, description: "Description" },
-        { name: "", description: "Description" },
-      ];
-      for (const body of bodies) {
+      for (const body of invalidBodies) {
         const response = await supertest(application.getExpressApplication())
           .post("/events")
           .send(body);
         expect(response.body).not.toBeUndefined();
-        expect(response.body.error).toBe(`Name cannot be undefined or empty`);
+        // TODO implement missing error mapper
+        expect(response.body.error).toBe(
+          `The parameter 'eventName' is missing.`
+        );
       }
     });
 
     test("should specify json in the content type header", async () => {
       const application = new Application();
-      const bodies = [
-        { description: "Description" },
-        { name: undefined, description: "Description" },
-        { name: "", description: "Description" },
-      ];
-      for (const body of bodies) {
+      for (const body of invalidBodies) {
         const response = await supertest(application.getExpressApplication())
           .post("/events")
           .send(body);
@@ -143,14 +145,15 @@ describe("POST /events", () => {
   });
 
   describe("when the description is incorrect", () => {
+    const invalidBodies = [
+      { name: "Name", jwt: "validJwt" },
+      { name: "Name", description: undefined, jwt: "validJwt" },
+      { name: "Name", description: "", jwt: "validJwt" },
+    ];
+
     test("should respond with 400", async () => {
       const application = new Application();
-      const bodies = [
-        { name: "Name" },
-        { name: "Name", description: undefined },
-        { name: "Name", description: "" },
-      ];
-      for (const body of bodies) {
+      for (const body of invalidBodies) {
         const response = await supertest(application.getExpressApplication())
           .post("/events")
           .send(body);
@@ -160,30 +163,21 @@ describe("POST /events", () => {
 
     test("should respond with an error in json", async () => {
       const application = new Application();
-      const bodies = [
-        { name: "Name" },
-        { name: "Name", description: undefined },
-        { name: "Name", description: "" },
-      ];
-      for (const body of bodies) {
+      for (const body of invalidBodies) {
         const response = await supertest(application.getExpressApplication())
           .post("/events")
           .send(body);
         expect(response.body).not.toBeUndefined();
+        // TODO implement missing error mapper
         expect(response.body.error).toBe(
-          `Description cannot be undefined or empty`
+          `The parameter 'eventDescription' is missing.`
         );
       }
     });
 
     test("should specify json in the content type header", async () => {
       const application = new Application();
-      const bodies = [
-        { name: "Name" },
-        { name: "Name", description: undefined },
-        { name: "Name", description: "" },
-      ];
-      for (const body of bodies) {
+      for (const body of invalidBodies) {
         const response = await supertest(application.getExpressApplication())
           .post("/events")
           .send(body);
@@ -194,3 +188,9 @@ describe("POST /events", () => {
     });
   });
 });
+
+// Missing tests :
+// - wrong jwt
+// - missing jwt
+// - invalid name
+// - invalid description

@@ -8,16 +8,19 @@ export const makeEventsRouter = (
 
   // Workaround as using commented version do not keep eventsController alive...
   // eventsRouter.post("/", eventsController.addNewEvent);
-  eventsRouter.post("/", (req: Request, res: Response, next: NextFunction) => {
-    eventsController.addNewEvent(req, res, next);
-  });
+  eventsRouter.post(
+    "/",
+    async (req: Request, res: Response, next: NextFunction) => {
+      await eventsController.addNewEvent(req, res, next);
+    }
+  );
 
   // Workaround as using commented version do not keep eventsController alive...
   // eventsRouter.get("/:id", eventsController.getEvent);
   eventsRouter.get(
     "/:id",
-    (req: Request, res: Response, next: NextFunction) => {
-      eventsController.getEventById(req, res, next);
+    async (req: Request, res: Response, next: NextFunction) => {
+      await eventsController.getEventById(req, res, next);
     }
   );
 

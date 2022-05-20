@@ -12,9 +12,9 @@ describe("InMemoryEventsRepository class", () => {
     const eventsRepository: InMemoryEventsRepository =
       new InMemoryEventsRepository();
 
-    items.forEach((item) => {
-      eventsRepository.addEvent(item.name, item.description);
-    });
+    for (let i = 0; i < items.length; i++) {
+      await eventsRepository.addEvent(items[i].name, items[i].description);
+    }
 
     const events = eventsRepository.getAllEvents();
 
@@ -43,9 +43,9 @@ describe("InMemoryEventsRepository class", () => {
     const eventsRepository: InMemoryEventsRepository =
       new InMemoryEventsRepository();
 
-    items.forEach((item) => {
-      eventsRepository.addEvent(item.name, item.description);
-    });
+    for (let i = 0; i < items.length; i++) {
+      await eventsRepository.addEvent(items[i].name, items[i].description);
+    }
 
     const events = eventsRepository.getAllEvents();
 
@@ -68,7 +68,7 @@ describe("InMemoryEventsRepository class", () => {
     const eventsRepository: InMemoryEventsRepository =
       new InMemoryEventsRepository();
 
-    const id = eventsRepository.addEvent("name", "description");
+    const id = await eventsRepository.addEvent("name", "description");
 
     expect(id.length).toBeGreaterThan(0);
   });
@@ -80,7 +80,7 @@ describe("InMemoryEventsRepository class", () => {
     const loopCount: number = 20;
     const ids: Array<EventId> = [];
     for (let i = 0; i < loopCount; ++i) {
-      const id = eventsRepository.addEvent("name", "description");
+      const id = await eventsRepository.addEvent("name", "description");
       ids.push(id);
     }
 
@@ -102,9 +102,9 @@ describe("InMemoryEventsRepository class", () => {
       { name: "Tennis", description: "A one-day tennis tournament." },
       { name: "Karting", description: "A karting on next Sunday." },
     ];
-    items.forEach((item) => {
-      eventsRepository.addEvent(item.name, item.description);
-    });
+    for (let i = 0; i < items.length; i++) {
+      await eventsRepository.addEvent(items[i].name, items[i].description);
+    }
 
     const events = eventsRepository.getAllEvents();
 
@@ -132,9 +132,9 @@ describe("InMemoryEventsRepository class", () => {
     const eventsRepository: InMemoryEventsRepository =
       new InMemoryEventsRepository();
 
-    const id: EventId = eventsRepository.addEvent("name", "description");
+    const id: EventId = await eventsRepository.addEvent("name", "description");
 
-    const event: EventItem = eventsRepository.getEvent(id);
+    const event: EventItem = await eventsRepository.getEvent(id);
 
     expect(event.name).toBe("name");
     expect(event.description).toBe("description");
@@ -145,7 +145,7 @@ describe("InMemoryEventsRepository class", () => {
       new InMemoryEventsRepository();
 
     const id: EventId = "unexisting id";
-    const event: EventItem = eventsRepository.getEvent(id);
+    const event: EventItem = await eventsRepository.getEvent(id);
 
     expect(event).toBeUndefined();
   });

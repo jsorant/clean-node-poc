@@ -6,7 +6,7 @@ import {
 // Dummy JWT validator for test purpose
 export class InMemoryJwtAuthentication implements IJWTAuthentication {
   private validJwtList: Array<JwtBase64>;
-  constructor(initialList: Array<JwtBase64>) {
+  constructor(initialList: Array<JwtBase64> = ["validJwt"]) {
     this.validJwtList = initialList;
   }
 

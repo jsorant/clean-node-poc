@@ -19,14 +19,16 @@ export class InMemoryEventsRepository implements IEventsRepository {
     this.events = [];
   }
 
-  addEvent(eventName: string, eventDescription: string): EventId {
-    const id = this.generateId();
-    this.events.push({
-      id,
-      name: eventName,
-      description: eventDescription,
+  addEvent(eventName: string, eventDescription: string): Promise<EventId> {
+    return new Promise((resolve, reject) => {
+      const id = this.generateId();
+      this.events.push({
+        id,
+        name: eventName,
+        description: eventDescription,
+      });
+      resolve(id);
     });
-    return id;
   }
 
   getAllEvents(): Array<EventItem> {
@@ -34,13 +36,15 @@ export class InMemoryEventsRepository implements IEventsRepository {
     return this.events;
   }
 
-  getEvent(eventId: EventId): EventItem {
-    let result: EventItem;
-    this.events.forEach((item: EventItem) => {
-      if (item.id === eventId) {
-        result = item;
-      }
+  getEvent(eventId: EventId): Promise<EventItem> {
+    return new Promise((resolve, reject) => {
+      let result: EventItem;
+      this.events.forEach((item: EventItem) => {
+        if (item.id === eventId) {
+          result = item;
+        }
+      });
+      resolve(result);
     });
-    return result;
   }
 }

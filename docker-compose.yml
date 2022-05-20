@@ -1,0 +1,23 @@
+version: "3"
+services:
+  mysql:
+    image: mysql:8
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: db
+    healthcheck:
+      test: mysqladmin ping -h 127.0.0.1 -u root --password=$$MYSQL_ROOT_PASSWORD
+
+  api:
+    image: node:14
+    volumes:
+      - ./:/app
+    ports:
+      - 3000:3000
+    command: npm run dev
+    env_file: .env.development
+    working_dir: /app
+    depends_on:
+      - mysql

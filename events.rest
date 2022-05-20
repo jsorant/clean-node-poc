@@ -1,0 +1,25 @@
+POST http://localhost:3000/events
+content-type: application/json
+
+{"name": "Event name", "description": "Event description", "jwt": "validJwt"}
+
+###
+
+GET http://localhost:3000/events/14
+content-type: application/json
+
+{"jwt": "validJwt"}
+
+###
+
+GET http://localhost:3000/events/1
+content-type: application/json
+
+{"jwt": "validJwt"}
+
+###
+
+GET http://localhost:3000/events/10000
+content-type: application/json
+
+{"jwt": "validJwt"}

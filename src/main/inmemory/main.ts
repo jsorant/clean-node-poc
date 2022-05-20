@@ -1,6 +1,6 @@
 import "reflect-metadata";
+import { Application } from "../../infrastructure/webserver/Application";
 import { configureDi } from "./di";
-import { Application } from "./infrastructure/webserver/Application";
 
 configureDi();
 const application = new Application();

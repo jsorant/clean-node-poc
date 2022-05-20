@@ -1,11 +1,26 @@
-# skeletons
+# Clean Architecture on a simple Nodejs backend server
 
-TODO:
+## Goal
 
-- missing unit tests
+The goal of this repository is to apply clean architecture concepts on a simple Nodejs backend server.
+
+References:
+
+- https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html
+- https://www.goodreads.com/book/show/18043011-clean-architecture
+
+## Next steps
+
+- Implement missing unit tests
 - Password authentication: plug + switch
-- e2e tests: supertest / testcontainers with real database
+- Localization & error string mapping
+- e2e tests: supertest / testcontainers with real database on current code base
 - e2e tests with a built docker image
 
+## Notes
+
 PowerShell command to add Docker traces for testcontainers:
+
+```
 $Env:DEBUG = "testcontainers\*"
+```

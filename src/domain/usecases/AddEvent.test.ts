@@ -1,3 +1,5 @@
+import { InvalidJwtError } from "../errors/InvalidJwtError";
+import { MissingParameterError } from "../errors/MissingParameterError";
 import { AddEvent } from "./AddEvent";
 
 const mockEventId = "EventIdentifier";
@@ -92,8 +94,68 @@ describe("AddEvent use case", () => {
     );
   });
 
+  test("should throw if the name is empty or undefined", async () => {
+    const usecase: AddEvent = new AddEvent(
+      mockEventsRepository,
+      mockJwtAuthentication,
+      mockLogger,
+      mockEventValidator
+    );
+    const names = ["", undefined];
+    for (const name of names) {
+      try {
+        await usecase.execute(name, "description", mockJwt);
+      } catch (err: any) {
+        expect(err instanceof MissingParameterError).toBeTruthy();
+        expect(err.message).toBe("The parameter 'eventName' is missing.");
+        expect((err as MissingParameterError).parameterName).toBe("eventName");
+      }
+    }
+  });
+
+  test("should throw if the description is empty or undefined", async () => {
+    const usecase: AddEvent = new AddEvent(
+      mockEventsRepository,
+      mockJwtAuthentication,
+      mockLogger,
+      mockEventValidator
+    );
+    const descriptions = ["", undefined];
+    for (const description of descriptions) {
+      try {
+        await usecase.execute("name", description, mockJwt);
+      } catch (err: any) {
+        expect(err instanceof MissingParameterError).toBeTruthy();
+        expect(err.message).toBe(
+          "The parameter 'eventDescription' is missing."
+        );
+        expect((err as MissingParameterError).parameterName).toBe(
+          "eventDescription"
+        );
+      }
+    }
+  });
+
+  test("should throw if the jwt is empty or undefined", async () => {
+    const usecase: AddEvent = new AddEvent(
+      mockEventsRepository,
+      mockJwtAuthentication,
+      mockLogger,
+      mockEventValidator
+    );
+    const jwts = ["", undefined];
+    for (const jwt of jwts) {
+      try {
+        await usecase.execute("name", "description", jwt);
+      } catch (err: any) {
+        expect(err instanceof MissingParameterError).toBeTruthy();
+        expect(err.message).toBe("The parameter 'jwt' is missing.");
+        expect((err as MissingParameterError).parameterName).toBe("jwt");
+      }
+    }
+  });
+
   test("should verify the jwt token", async () => {
-    mockJwtAuthentication.verify.mockReturnValue(true);
     const usecase: AddEvent = new AddEvent(
       mockEventsRepository,
       mockJwtAuthentication,
@@ -107,6 +169,7 @@ describe("AddEvent use case", () => {
   });
 
   test("should throw if the jwt token verification failed", async () => {
+    mockJwtAuthentication.verify.mockReset();
     mockJwtAuthentication.verify.mockReturnValue(false);
     const usecase: AddEvent = new AddEvent(
       mockEventsRepository,
@@ -114,11 +177,26 @@ describe("AddEvent use case", () => {
       mockLogger,
       mockEventValidator
     );
-    expect(async () => {
-      await usecase.execute("name", "description", mockJwt);
-    }).toThrowError("InvalidJwtError");
 
-    expect(mockJwtAuthentication.verify.mock.calls.length).toBe(1);
-    expect(mockJwtAuthentication.verify.mock.calls[0][0]).toBe(mockJwt);
+    // Two ways to test custom errors & async functions that throw:
+
+    // 1) reject.ToThrow
+
+    await expect(
+      usecase.execute("name", "description", mockJwt)
+    ).rejects.toThrow(InvalidJwtError);
+
+    await expect(
+      usecase.execute("name", "description", mockJwt)
+    ).rejects.toThrow("Invalid JWT");
+
+    // 2) Try / Catch
+
+    try {
+      await usecase.execute("name", "description", mockJwt);
+    } catch (err: any) {
+      expect(err instanceof InvalidJwtError).toBeTruthy();
+      expect(err.message).toBe("Invalid JWT");
+    }
   });
 });

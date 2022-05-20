@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import { autoInjectable } from "tsyringe";
-import { InvalidEventDescriptionError } from "../../domain/errors/EventValidationError";
+import { EventNotFoundError } from "../../domain/errors/EventNotFoundError";
+import { InvalidEventDescriptionError } from "../../domain/errors/InvalidEventDescriptionError";
 import { InvalidEventNameError } from "../../domain/errors/InvalidEventNameError";
+import { InvalidJwtError } from "../../domain/errors/InvalidJwtError";
+import { MissingParameterError } from "../../domain/errors/MissingParameterError";
 import { EventItem } from "../../domain/ports/IEventsRepository";
 import { AddEvent } from "../../domain/usecases/AddEvent";
 import { GetEvent } from "../../domain/usecases/GetEvent";
@@ -23,8 +26,8 @@ export class EventsController {
   ): Promise<void> {
     try {
       // Call use case
-      const { name, description } = req.body;
-      const id = await this.addEvent.execute(name, description);
+      const { name, description, jwt } = req.body;
+      const id = await this.addEvent.execute(name, description, jwt);
 
       // Format response
       res.status(200);
@@ -32,11 +35,15 @@ export class EventsController {
         eventId: id,
       });
     } catch (err: any) {
+      // TODO improve this with error mapping
       if (
+        err instanceof MissingParameterError ||
         err instanceof InvalidEventNameError ||
         err instanceof InvalidEventDescriptionError
       ) {
         res.status(400).send({ error: err.message });
+      } else if (err instanceof InvalidJwtError) {
+        res.status(401).send({ error: err.message });
       } else {
         next(err);
       }
@@ -49,19 +56,22 @@ export class EventsController {
     next: NextFunction
   ): Promise<void> {
     try {
+      const { jwt } = req.body;
       const eventId = req.params.id;
       // Call use case
-      const event: EventItem = await this.getEvent.execute(eventId);
-
+      const event: EventItem = await this.getEvent.execute(eventId, jwt);
       // Format response
-      if (event) {
-        res.status(200);
-        res.json(event);
-      } else {
-        res.status(404).send({ error: `No event found with id: ${eventId}.` });
-      }
+      res.status(200);
+      res.json(event);
     } catch (err: any) {
-      next(err);
+      // TODO improve this with error mapping
+      if (err instanceof InvalidJwtError) {
+        res.status(401).send({ error: err.message });
+      } else if (err instanceof EventNotFoundError) {
+        res.status(404).send({ error: err.message });
+      } else {
+        next(err);
+      }
     }
   }
 }

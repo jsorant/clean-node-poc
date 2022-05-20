@@ -1,7 +1,8 @@
 import "reflect-metadata";
 import { inject, injectable } from "tsyringe";
-import { EventValidator } from "../entities/EventValidator";
+import { IEventValidator } from "../entities/EventValidator";
 import { InvalidJwtError } from "../errors/InvalidJwtError";
+import { MissingParameterError } from "../errors/MissingParameterError";
 import { EventId, IEventsRepository } from "../ports/IEventsRepository";
 import { IJWTAuthentication, JwtBase64 } from "../ports/IJWTAuthentication";
 import { ILogger } from "../ports/ILogger";
@@ -11,7 +12,7 @@ export class AddEvent {
   private eventsRepository: IEventsRepository;
   private jwtAuthentication: IJWTAuthentication;
   private logger: ILogger;
-  private eventValidator: EventValidator;
+  private eventValidator: IEventValidator;
 
   public constructor(
     @inject("IEventsRepository")
@@ -20,7 +21,8 @@ export class AddEvent {
     jwtAuthentication: IJWTAuthentication,
     @inject("ILogger")
     logger: ILogger,
-    eventValidator: EventValidator
+    @inject("IEventValidator")
+    eventValidator: IEventValidator
   ) {
     this.eventsRepository = eventsRepository;
     this.jwtAuthentication = jwtAuthentication;
@@ -34,12 +36,23 @@ export class AddEvent {
     eventDescription: string,
     jwt: JwtBase64
   ): Promise<EventId> {
+    // Validate inputs
+    if (!eventName || eventName === "") {
+      throw new MissingParameterError("eventName");
+    }
+    if (!eventDescription || eventDescription === "") {
+      throw new MissingParameterError("eventDescription");
+    }
+    if (!jwt || jwt === "") {
+      throw new MissingParameterError("jwt");
+    }
+
     // Verify jwt
     if (!this.jwtAuthentication.verify(jwt)) {
       throw new InvalidJwtError("Invalid JWT");
     }
 
-    // Validate
+    // Validate name & description
     this.eventValidator.ensureIsValidOrThrow(eventName, eventDescription);
 
     // Add

@@ -1,12 +1,16 @@
 import "reflect-metadata";
 import supertest from "supertest";
 import { container } from "tsyringe";
+import { EventValidator } from "../../domain/entities/EventValidator";
 import { InMemoryEventsRepository } from "../repositories/InMemoryEventsRepository";
+import { InMemoryJwtAuthentication } from "../services/InMemoryJwtAuthentication";
 import { Application } from "./Application";
 
 const mockLogger = {
   log: jest.fn(),
 };
+
+const jwt = "validJwt";
 
 const eventsRepository: InMemoryEventsRepository =
   new InMemoryEventsRepository();
@@ -26,6 +30,14 @@ describe("Get /events/:id", () => {
     container.register("ILogger", {
       useValue: mockLogger,
     });
+
+    container.register("IJwtAuthentication", {
+      useClass: InMemoryJwtAuthentication,
+    });
+
+    container.register("IEventValidator", {
+      useClass: EventValidator,
+    });
   });
 
   beforeEach(async () => {
@@ -41,7 +53,7 @@ describe("Get /events/:id", () => {
       const application = new Application();
       const response = await supertest(application.getExpressApplication())
         .get(`/events/${initialEventIdInRepository}`)
-        .send();
+        .send({ jwt });
 
       expect(response.body.name).toBe(initialEventNameInRepository);
       expect(response.body.description).toBe(
@@ -54,7 +66,7 @@ describe("Get /events/:id", () => {
       const application = new Application();
       const response = await supertest(application.getExpressApplication())
         .get(`/events/${initialEventIdInRepository}`)
-        .send();
+        .send({ jwt });
 
       expect(response.statusCode).toBe(200);
     });
@@ -63,7 +75,7 @@ describe("Get /events/:id", () => {
       const application = new Application();
       const response = await supertest(application.getExpressApplication())
         .get(`/events/${initialEventIdInRepository}`)
-        .send();
+        .send({ jwt });
 
       expect(response.headers["content-type"]).toEqual(
         expect.stringContaining("json")
@@ -76,7 +88,7 @@ describe("Get /events/:id", () => {
       const application = new Application();
       const response = await supertest(application.getExpressApplication())
         .get(`/events/${initialEventIdInRepository}-unexisting`)
-        .send();
+        .send({ jwt });
 
       expect(response.statusCode).toBe(404);
     });
@@ -85,11 +97,11 @@ describe("Get /events/:id", () => {
       const application = new Application();
       const response = await supertest(application.getExpressApplication())
         .get(`/events/${initialEventIdInRepository}-unexisting`)
-        .send();
+        .send({ jwt });
 
       expect(response.body).not.toBeUndefined();
       expect(response.body.error).toBe(
-        `No event found with id: ${initialEventIdInRepository}-unexisting.`
+        `Event with id '${initialEventIdInRepository}-unexisting' not found.`
       );
     });
 
@@ -97,7 +109,7 @@ describe("Get /events/:id", () => {
       const application = new Application();
       const response = await supertest(application.getExpressApplication())
         .get(`/events/${initialEventIdInRepository}-unexisting`)
-        .send();
+        .send({ jwt });
 
       expect(response.headers["content-type"]).toEqual(
         expect.stringContaining("json")
@@ -105,3 +117,6 @@ describe("Get /events/:id", () => {
     });
   });
 });
+
+// Missing tests :
+// - wrong jwt

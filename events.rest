@@ -5,13 +5,6 @@ content-type: application/json
 
 ###
 
-GET http://localhost:3000/events/14
-content-type: application/json
-
-{"jwt": "validJwt"}
-
-###
-
 GET http://localhost:3000/events/1
 content-type: application/json
 
@@ -23,3 +16,10 @@ GET http://localhost:3000/events/10000
 content-type: application/json
 
 {"jwt": "validJwt"}
+
+###
+
+GET http://localhost:3000/events/1
+content-type: application/json
+
+{"jwt": "invalidJwt"}

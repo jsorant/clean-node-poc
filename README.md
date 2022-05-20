@@ -35,13 +35,15 @@ npm run dev:inmemory
 
 Use REST Client VSCode plugin to send queries using events.rest file.
 
-### Run backend server with a read database using docker compose
+### Run backend server with a read database using docker-compose
 
 ```
 npm run dev:docker
 ```
 
 Use REST Client VSCode plugin to send queries using events.rest file.
+
+NB: Docker must be installed and running.
 
 ## Next steps
 

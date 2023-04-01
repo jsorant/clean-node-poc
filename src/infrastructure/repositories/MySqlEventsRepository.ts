@@ -31,7 +31,7 @@ export class MySqlEventsRepository implements IEventsRepository {
     const [rows] = await connection.query(
       `
     SELECT * FROM ${TABLE_NAME}
-    WHERE ${COLUMN_ID} = ${eventId};
+    WHERE ${COLUMN_ID} = "${eventId}";
     `
     );
     await connection.release();
@@ -42,7 +42,7 @@ export class MySqlEventsRepository implements IEventsRepository {
     } else {
       const item = rowDataPacketArray[0];
       return {
-        id: item[COLUMN_ID],
+        id: item[COLUMN_ID].toString(),
         name: item[COLUMN_NAME],
         description: item[COLUMN_DESCRIPTION],
       };

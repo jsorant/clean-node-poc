@@ -32,8 +32,7 @@ export class InMemoryEventsRepository implements IEventsRepository {
   }
 
   getAllEvents(): Array<EventItem> {
-    // TODO: improve this with deep copy
-    return this.events;
+    return [...this.events];
   }
 
   getEvent(eventId: EventId): Promise<EventItem> {

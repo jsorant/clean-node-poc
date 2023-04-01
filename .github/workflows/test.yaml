@@ -12,3 +12,9 @@ jobs:
 
       - name: Run unit & integration tests
         run: npm run test
+
+      - name: Run end to end tests (in-memory database)
+        run: npm run test:e2e:compose:inmemory
+
+      - name: Run end to end tests (mysql database)
+        run: npm run test:e2e:compose:mysql

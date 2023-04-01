@@ -1,0 +1,10 @@
+version: "3"
+services:
+  api:
+    image: node:14
+    volumes:
+      - ./:/app
+    ports:
+      - 3000:3000
+    command: npm run dev:inmemory
+    working_dir: /app

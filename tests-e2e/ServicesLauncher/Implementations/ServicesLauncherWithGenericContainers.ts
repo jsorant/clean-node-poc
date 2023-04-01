@@ -21,10 +21,12 @@ export class ServicesLauncherWithGenericContainers implements ServicesLauncher {
       .withWaitStrategy(Wait.forLogMessage("server is listening on 3000"))
       .start();
 
+    /*
     (await this.apiContainer.logs())
       .on("data", (line) => console.log(line))
       .on("err", (line) => console.error(line))
       .on("end", () => console.log("Stream closed"));
+      */
 
     console.log("generic container mounted");
   }

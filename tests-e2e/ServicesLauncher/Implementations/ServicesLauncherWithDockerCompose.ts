@@ -28,11 +28,13 @@ export class ServicesLauncherWithDockerCompose implements ServicesLauncher {
       )
       .up();
 
+    /*
     const apiContainer = this.environment.getContainer("api_1");
     (await apiContainer.logs())
       .on("data", (line) => console.log(line))
       .on("err", (line) => console.error(line))
       .on("end", () => console.log("Stream closed"));
+      */
 
     console.log("docker compose mounted");
   }

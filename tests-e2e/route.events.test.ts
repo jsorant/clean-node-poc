@@ -53,7 +53,6 @@ describe("Application", () => {
       await axios.get(`${apiUrl}/events/non-existing`, {});
       throw new Error("Test failed: exception was expected");
     } catch (error) {
-      console.log(error.response);
       expect(error.response.status).toEqual(404);
       expect(error.response.data.error).toEqual(
         "Event with id 'non-existing' not found."

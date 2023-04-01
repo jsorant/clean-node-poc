@@ -1,42 +1,20 @@
 import axios from "axios";
-import { GenericContainer, StartedTestContainer, Wait } from "testcontainers";
+import { ServicesLauncher } from "./ServicesLauncher/ServicesLauncher";
+import { ServicesLauncherProxy } from "./ServicesLauncher/ServicesLauncherProxy";
 
 describe("Application", () => {
   jest.setTimeout(60000); // in milliseconds
 
-  let apiContainer: StartedTestContainer;
+  let servicesLauncher: ServicesLauncher;
   let apiUrl: string;
 
   beforeAll(async () => {
-    apiContainer = await new GenericContainer("node:14")
-      .withExposedPorts(3000)
-      .withBindMounts([
-        {
-          source: "/Users/jso/dev/clean-node-poc",
-          target: "/app",
-          mode: "ro",
-        },
-      ])
-      .withWorkingDir("/app")
-      .withCommand(["npm", "run", "dev:inmemory"])
-      .withWaitStrategy(Wait.forLogMessage("server is listening on 3000"))
-      .start();
-
-    (await apiContainer.logs())
-      .on("data", (line) => console.log(line))
-      .on("err", (line) => console.error(line))
-      .on("end", () => console.log("Stream closed"));
-
-    apiUrl = `http://${apiContainer.getHost()}:${apiContainer.getMappedPort(
-      3000
-    )}`;
+    servicesLauncher = new ServicesLauncherProxy();
+    await servicesLauncher.start();
+    apiUrl = servicesLauncher.apiUrl();
   });
 
   it("should adds new events", async () => {
-    console.log("Wait...");
-    await new Promise((resolve) => setTimeout(resolve, 10000));
-    console.log("RUN");
-
     const response1 = await axios.post(`${apiUrl}/events`, {
       name: "First event",
       description: "This is the first event",
@@ -67,6 +45,6 @@ describe("Application", () => {
   });
 */
   afterAll(async () => {
-    await apiContainer.stop();
+    await servicesLauncher.stop();
   });
 });

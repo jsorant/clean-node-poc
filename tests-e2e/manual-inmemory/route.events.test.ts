@@ -1,6 +1,5 @@
 import axios from "axios";
-import * as path from "path";
-import { GenericContainer, StartedTestContainer } from "testcontainers";
+import { GenericContainer, StartedTestContainer, Wait } from "testcontainers";
 
 describe("Application", () => {
   jest.setTimeout(60000); // in milliseconds
@@ -13,25 +12,14 @@ describe("Application", () => {
       .withExposedPorts(3000)
       .withBindMounts([
         {
-          source: "/local/file.txt",
-          target: "/remote/file.txt",
-        },
-        {
-          source: "/local/dir",
-          target: "/remote/dir",
+          source: "/Users/jso/dev/clean-node-poc",
+          target: "/app",
           mode: "ro",
         },
       ])
-      .withBindMount(path.join(__dirname, "./node_modules"), "/node_modules")
-      .withBindMount(
-        path.join(__dirname, "./babel.config.js"),
-        "/babel.config.js"
-      )
-      .withBindMount(path.join(__dirname, "./package.json"), "/package.json")
-      .withBindMount(path.join(__dirname, "./tsconfig.json"), "/tsconfig.json")
-      .withBindMount(path.join(__dirname, "./src"), "/src")
-      .withBindMount(path.join(__dirname, "./tests-e2e"), "/tests-e2e")
-      .withCmd(["npm", "run", "dev:inmemory"])
+      .withWorkingDir("/app")
+      .withCommand(["npm", "run", "dev:inmemory"])
+      .withWaitStrategy(Wait.forLogMessage("server is listening on 3000"))
       .start();
 
     (await apiContainer.logs())

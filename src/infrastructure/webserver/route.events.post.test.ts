@@ -3,14 +3,11 @@ import supertest from "supertest";
 import { container } from "tsyringe";
 import { EventValidator } from "../../domain/entities/EventValidator";
 import { InMemoryEventsRepository } from "../repositories/InMemoryEventsRepository";
-import { InMemoryJwtAuthentication } from "../services/InMemoryJwtAuthentication";
 import { Application } from "./Application";
 
 const mockLogger = {
   log: jest.fn(),
 };
-
-const jwt = "validJwt";
 
 const eventsRepository: InMemoryEventsRepository =
   new InMemoryEventsRepository();
@@ -27,10 +24,6 @@ describe("POST /events", () => {
       useValue: mockLogger,
     });
 
-    container.register("IJwtAuthentication", {
-      useClass: InMemoryJwtAuthentication,
-    });
-
     container.register("IEventValidator", {
       useClass: EventValidator,
     });
@@ -40,11 +33,10 @@ describe("POST /events", () => {
     eventsRepository.reset();
   });
 
-  describe("given a valid name, a valid description and a valid jwt", () => {
+  describe("given a valid name and a valid description", () => {
     const validBody = {
       name: "Name",
       description: "Description",
-      jwt,
     };
 
     test("should save the username and the password in the repository", async () => {
@@ -63,9 +55,7 @@ describe("POST /events", () => {
         application.getExpressApplication()
       )
         .get(`/events/${addedEventId}`)
-        .send({
-          jwt,
-        });
+        .send({});
 
       expect(getEventResponse.body.name).toBe("Name");
       expect(getEventResponse.body.description).toBe("Description");
@@ -102,9 +92,9 @@ describe("POST /events", () => {
 
   describe("when the name is incorrect", () => {
     const invalidBodies = [
-      { description: "Description", jwt },
-      { name: undefined, description: "Description", jwt },
-      { name: "", description: "Description", jwt },
+      { description: "Description" },
+      { name: undefined, description: "Description" },
+      { name: "", description: "Description" },
     ];
 
     test("should respond with 400", async () => {
@@ -146,9 +136,9 @@ describe("POST /events", () => {
 
   describe("when the description is incorrect", () => {
     const invalidBodies = [
-      { name: "Name", jwt: "validJwt" },
-      { name: "Name", description: undefined, jwt: "validJwt" },
-      { name: "Name", description: "", jwt: "validJwt" },
+      { name: "Name" },
+      { name: "Name", description: undefined },
+      { name: "Name", description: "" },
     ];
 
     test("should respond with 400", async () => {
@@ -190,7 +180,5 @@ describe("POST /events", () => {
 });
 
 // Missing tests :
-// - wrong jwt
-// - missing jwt
 // - invalid name
 // - invalid description

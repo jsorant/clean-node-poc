@@ -10,6 +10,7 @@
     "dev:inmemory": "ts-node src/main/inmemory/main.ts",
     "dev:docker": "docker-compose -f docker-compose.yml up --build",
     "test": "jest /src --verbose",
+    "test:coverage": "npm test -- --coverage --collectCoverageFrom='./src/**'",
     "test:watch": "npm run test -- --watch --verbose",
     "test:e2e": "jest tests-e2e --runInBand --verbose",
     "test:e2e:compose:inmemory": "DOCKER_STRATEGY=compose-inmemory npm run test:e2e",

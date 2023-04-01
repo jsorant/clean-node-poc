@@ -47,6 +47,8 @@ NB: Docker must be installed and running.
 
 ## Next steps
 
+- Make ete test pass (remove jwt)
+- Make an image and test e2e with that image
 - Implement missing unit tests
 - Password authentication: plug + switch
 - Localization & error string mapping

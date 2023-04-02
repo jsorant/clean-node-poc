@@ -26,7 +26,7 @@ export class MySqlEventsRepository implements IEventsRepository {
     return (row as any).insertId.toString();
   }
 
-  async getEvent(eventId: EventId): Promise<EventItem> {
+  async getEvent(eventId: EventId): Promise<EventItem | undefined> {
     const connection = await this.getConnection();
     const [rows] = await connection.query(
       `

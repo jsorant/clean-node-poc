@@ -8,5 +8,5 @@ export interface EventItem {
 
 export interface IEventsRepository {
   addEvent(eventName: string, eventDescription: string): Promise<EventId>;
-  getEvent(eventId: EventId): Promise<EventItem>;
+  getEvent(eventId: EventId): Promise<EventItem | undefined>;
 }

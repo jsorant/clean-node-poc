@@ -36,15 +36,9 @@ export class InMemoryEventsRepository implements IEventsRepository {
     return [...this.events];
   }
 
-  getEvent(eventId: EventId): Promise<EventItem> {
-    return new Promise((resolve, reject) => {
-      let result: EventItem;
-      this.events.forEach((item: EventItem) => {
-        if (item.id === eventId) {
-          result = item;
-        }
-      });
-      resolve(result);
-    });
+  async getEvent(eventId: EventId): Promise<EventItem> {
+    const event = this.events.find((event) => event.id === eventId);
+    // TODO what if event not found ?
+    return event;
   }
 }

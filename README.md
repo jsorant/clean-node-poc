@@ -23,9 +23,29 @@ npm install
 npm run test
 ```
 
+```
+npm run test:coverage
+```
+
 ### Run e2e tests:
 
-Coming next.
+#### Based on testcontainers with GenericContainers
+
+```
+npm run test:e2e
+```
+
+#### Based on testcontainers with docker compose and a mysql database
+
+```
+npm run test:e2e:compose:mysql
+```
+
+#### Based on testcontainers with docker compose and an in-memory database
+
+```
+npm run test:e2e:compose:inmemory
+```
 
 ### Run backend server with inmemory implementations
 
@@ -47,17 +67,16 @@ NB: Docker must be installed and running.
 
 ## Next steps
 
-- Make ete test pass (remove jwt)
+- DDD: use Event instead of validator
 - Make an image and test e2e with that image
 - Implement missing unit tests
-- Password authentication: plug + switch
 - Localization & error string mapping
-- e2e tests: supertest / testcontainers with real database on current code base
-- e2e tests with a built docker image
 
-## Notes
+## Notes: Testcontainers debug traces
 
-PowerShell command to add Docker traces for testcontainers:
+Add an environment variable to enable debug traces.
+
+PowerShell command:
 
 ```
 $Env:DEBUG = "testcontainers\*"

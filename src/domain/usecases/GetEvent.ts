@@ -24,17 +24,22 @@ export class GetEvent {
   }
 
   async execute(eventId: EventId): Promise<EventItem> {
-    // Get
+    const event: EventItem = await this.getEventOrThrow(eventId);
+    this.logOperation(eventId, event);
+    return event;
+  }
+
+  private logOperation(eventId: string, event: EventItem) {
+    this.logger.log(
+      `Event retrieved from id=${eventId}: name=${event.name}, description=${event.description}`
+    );
+  }
+
+  private async getEventOrThrow(eventId: string) {
     const event: EventItem = await this.eventsRepository.getEvent(eventId);
     if (!event) {
       throw new EventNotFoundError(eventId);
     }
-
-    // Log operation
-    this.logger.log(
-      `Event retrieved from id=${eventId}: name=${event.name}, description=${event.description}`
-    );
-
     return event;
   }
 }

@@ -19,16 +19,17 @@ export class InMemoryEventsRepository implements IEventsRepository {
     this.events = [];
   }
 
-  addEvent(eventName: string, eventDescription: string): Promise<EventId> {
-    return new Promise((resolve, reject) => {
-      const id = this.generateId();
-      this.events.push({
-        id,
-        name: eventName,
-        description: eventDescription,
-      });
-      resolve(id);
+  async addEvent(
+    eventName: string,
+    eventDescription: string
+  ): Promise<EventId> {
+    const id: string = this.generateId();
+    this.events.push({
+      id,
+      name: eventName,
+      description: eventDescription,
     });
+    return id;
   }
 
   getAllEvents(): Array<EventItem> {
